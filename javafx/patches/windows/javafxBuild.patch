@@ -1,0 +1,53 @@
+From 5354124969c98a1fbd9a9267876f57ba469fac56 Mon Sep 17 00:00:00 2001
+From: Rui Li <ruiamzn@amazon.com>
+Date: Fri, 24 Jun 2022 22:44:34 +0000
+Subject: [PATCH] Add support for building with VS2015
+
+---
+ buildSrc/genVSproperties.bat | 4 ++++
+ buildSrc/win.gradle          | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/buildSrc/genVSproperties.bat b/buildSrc/genVSproperties.bat
+index 003d0ca3..fe78789e 100644
+--- a/buildSrc/genVSproperties.bat
++++ b/buildSrc/genVSproperties.bat
+@@ -43,6 +43,8 @@ if not "%VS150COMNTOOLS%"=="" (
+   if exist "%VSVARS32FILE%" set "VS150COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build"
+ )
+ set VSVARSDIR=%VS150COMNTOOLS%
++if "%VSVARSDIR%"=="" set VSVER=140
++if "%VSVARSDIR%"=="" set VSVARSDIR=%VS140COMNTOOLS%
+ if "%VSVARSDIR%"=="" set VSVER=120
+ if "%VSVARSDIR%"=="" set VSVARSDIR=%VS120COMNTOOLS%
+ if "%VSVARSDIR%"=="" set VSVER=100
+@@ -54,11 +56,13 @@ REM   to build media), so we set it here.
+
+ if "%VSVER%"=="100" set VSVARS32=%VSVARSDIR%\vsvars32.bat
+ if "%VSVER%"=="120" set VSVARS32=%VSVARSDIR%\vsvars32.bat
++if "%VSVER%"=="140" set VSVARS32=%VSVARSDIR%\vsvars32.bat
+ if "%VSVER%"=="150" set VSVARS32=%VSVARSDIR%\vcvars32.bat
+ call "%VSVARS32%" > NUL
+
+ if "%VSVER%"=="100" set VCVARSALL=%VCINSTALLDIR%\vcvarsall.bat
+ if "%VSVER%"=="120" set VCVARSALL=%VCINSTALLDIR%\vcvarsall.bat
++if "%VSVER%"=="140" set VCVARSALL=%VCINSTALLDIR%\vcvarsall.bat
+ if "%VSVER%"=="150" set VCVARSALL=%VSVARSDIR%\vcvarsall.bat
+ call "%VCVARSALL%" %VCARCH% > NUL
+
+diff --git a/buildSrc/win.gradle b/buildSrc/win.gradle
+index 6ca4c7bd..def4b4a7 100644
+--- a/buildSrc/win.gradle
++++ b/buildSrc/win.gradle
+@@ -137,7 +137,7 @@ if (winVsVer == 150) {
+     msvcBinDir = (IS_64
+                       ? "$WINDOWS_VS_VSINSTALLDIR/VC/Tools/MSVC/$msvcVer/bin/HostX64/x64"
+                       : "$WINDOWS_VS_VSINSTALLDIR/VC/Tools/MSVC/$msvcVer/bin/HostX86/x86")
+-} else if (winVsVer <= 120) {
++} else if (winVsVer <= 140) {
+     msvcBinDir = (IS_64
+                       ? "$WINDOWS_VS_VSINSTALLDIR/VC/BIN/amd64"
+                       : "$WINDOWS_VS_VSINSTALLDIR/VC/BIN")
+--
+2.36.1
+
