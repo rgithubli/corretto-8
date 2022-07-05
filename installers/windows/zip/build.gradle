@@ -97,8 +97,8 @@ task copyImage() {
         // Copy image
         copy {
             from "${executeBuild.workingDir}/build/${project.jdkImageName}/images"
-           include "j2sdk-image/**"
-           include "j2re-image/**"
+            include "j2sdk-image/**"
+            include "j2re-image/**"
             into destination
         }
         // Copy version.txt into JDK
@@ -118,8 +118,8 @@ task copyImage() {
         // Copy javafx into j2sdk
         copy {
             from createJavafxOverlay.destinationDir
-           exclude "rt"
-           exclude "rt/**"
+            exclude "rt"
+            exclude "rt/**"
             into "$destination/j2sdk-image"
         }
         // Copy javafx into j2re
@@ -133,7 +133,7 @@ task copyImage() {
 task packageJre(type: Zip) {
     dependsOn copyImage
     archiveName = "unsigned-jre-image.${project.correttoArch}.zip"
-    from("$buildDir/j2re-image") {
+    from("$buildDir/images/j2re-image") {
         exclude '**/*.diz'
     }
 }
@@ -142,7 +142,7 @@ task packageJdk(type: Zip) {
     dependsOn copyImage
     archiveName  = "unsigned-jdk-image.${project.correttoArch}.zip"
 
-    from("$buildDir/j2sdk-image") {
+    from("$buildDir/images/j2sdk-image") {
         exclude '**/*.diz'
     }
 }
@@ -150,7 +150,7 @@ task packageJdk(type: Zip) {
 task packageJreDebugSymbols(type: Zip) {
     dependsOn copyImage
     archiveName  = "unsigned-jre-debugsymbols-image.${project.correttoArch}.zip"
-    from ("$buildDir/j2re-image") {
+    from ("$buildDir/images/j2re-image") {
         include '**/*.diz'
     }
 }
@@ -158,7 +158,7 @@ task packageJreDebugSymbols(type: Zip) {
 task packageJdkDebugSymbols(type: Zip) {
     dependsOn copyImage
     archiveName  = "unsigned-jdk-debugsymbols-image.${project.correttoArch}.zip"
-    from ("$buildDir/j2sdk-image") {
+    from ("$buildDir/images/j2sdk-image") {
         include '**/*.diz'
     }
 }
