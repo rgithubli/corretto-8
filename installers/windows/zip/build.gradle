@@ -21,7 +21,12 @@
 
 import java.nio.file.Paths
 
+configurations {
+    javafx
+}
+
 dependencies {
+    javafx project(path: ':javafx', configuration: 'archives')
     compile project(path: ':openjdksrc', configuration: 'archives')
 }
 
@@ -40,10 +45,8 @@ task configureBuild(type: Exec) {
     // Platform specific flags
     def command = ['bash', 'configure',
             "--with-boot-jdk=${project.getProperty('bootjdk_dir')}",
-            "--with-msvcr-dll=${project.getProperty('vcruntime_dir')}/msvcr120.dll",
-            "--with-msvcp-dll=${project.getProperty('msvcp_dir')}/msvcp120.dll",
             "--with-freetype=${project.getProperty('freetype_dir')}",
-            "--with-toolchain-version=2013"]
+            ]
     // Common flags
     command += project.correttoCommonFlags
     commandLine command.flatten()
@@ -56,9 +59,22 @@ task executeBuild(type: Exec) {
     commandLine 'make', 'clean', 'images'
 }
 
+task createJavafxOverlay(type: Copy) {
+    dependsOn project.configurations.javafx
+    from tarTree(project.configurations.javafx.singleFile)
+    into "$buildDir/javafx"
+    eachFile {
+        if (it.path.startsWith('rt/')) {
+            it.path = it.path.replace('rt/', 'jre/')
+        }
+    }
+}
+
 task copyImages() {
     dependsOn executeBuild
+    dependsOn createJavafxOverlay
     outputs.dir(packagingDir)
+
     doLast {
         // Copy jdk
         copy {
@@ -78,6 +94,18 @@ task copyImages() {
             include '**/*.diz'
             into "$packagingDir/jdk-symbols"
         }
+        // Copy javafx into jdk
+        copy {
+            from createJavafxOverlay.destinationDir
+            exclude "rt"
+            exclude "rt/**"
+            into "$packagingDir/jdk"
+        }
+        // Copy javafx into jre
+        copy {
+            from "$createJavafxOverlay.destinationDir/jre"
+            into "$packagingDir/jre"
+         }
     }
 }
 
@@ -99,8 +127,6 @@ task copyCacerts(type: Copy) {
     from file("$packagingDir/jdk/jre/lib/security/cacerts")
     into file("$packagingDir/jre/lib/security")
 }
-
-
 
 task fixPermissions() {
     dependsOn copyCacerts

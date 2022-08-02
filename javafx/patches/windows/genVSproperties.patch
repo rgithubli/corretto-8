@@ -1,0 +1,13 @@
+diff --git a/buildSrc/genVSproperties.bat b/buildSrc/genVSproperties.bat
+index 003d0ca3..23dd721e 100644
+--- a/buildSrc/genVSproperties.bat
++++ b/buildSrc/genVSproperties.bat
+@@ -42,7 +42,7 @@ if not "%VS150COMNTOOLS%"=="" (
+ ) else (
+   if exist "%VSVARS32FILE%" set "VS150COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build"
+ )
+-set VSVARSDIR=%VS150COMNTOOLS%
++set VSVARSDIR=%VS150COMNTOOLS%\..\..\VC\Auxiliary\Build
+ if "%VSVARSDIR%"=="" set VSVER=120
+ if "%VSVARSDIR%"=="" set VSVARSDIR=%VS120COMNTOOLS%
+ if "%VSVARSDIR%"=="" set VSVER=100
