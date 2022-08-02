@@ -45,8 +45,7 @@ task configureBuild(type: Exec) {
     // Platform specific flags
     def command = ['bash', 'configure',
             "--with-boot-jdk=${project.getProperty('bootjdk_dir')}",
-            "--with-freetype=${project.getProperty('freetype_dir')}",
-            ]
+            "--with-freetype-src=${project.getProperty('freetype_dir')}"]
     // Common flags
     command += project.correttoCommonFlags
     commandLine command.flatten()
