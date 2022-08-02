@@ -47079,7 +47079,7 @@ printf "%s\n" "$as_me: Trying to compile freetype sources with PlatformToolset=$
     $ECHO -e "@echo off\n"\
 	     "$MSBUILD $vcxproj_path "\
 		       "/p:PlatformToolset=$PLATFORM_TOOLSET "\
-		       "/p:Configuration=\"Release Multithreaded\" "\
+		       "/p:Configuration=\"Release Static\" "\
 		       "/p:Platform=$freetype_platform "\
 		       "/p:ConfigurationType=DynamicLibrary "\
 		       "/p:TargetName=freetype "\
@@ -47092,7 +47092,7 @@ printf "%s\n" "$as_me: Trying to compile freetype sources with PlatformToolset=$
       $ECHO -e "@echo off\n"\
 	       "$MSBUILD $vcxproj_path "\
 			 "/p:PlatformToolset=$PLATFORM_TOOLSET "\
-			 "/p:Configuration=\"Release Multithreaded\" "\
+			 "/p:Configuration=\"Release Static\" "\
 			 "/p:Platform=$freetype_platform "\
 			 "/p:ConfigurationType=StaticLibrary "\
 			 "/p:TargetName=freetype "\
