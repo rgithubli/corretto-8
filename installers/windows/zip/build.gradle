@@ -127,28 +127,8 @@ task copyCacerts(type: Copy) {
     into file("$packagingDir/jre/lib/security")
 }
 
-task fixPermissions() {
-    dependsOn copyCacerts
-    def rel = Paths.get("$packagingDir/placeholder").relativize(imagesDir.toPath())
-    outputs.dir(packagingDir)
-    doLast {
-        exec {
-            workingDir "$packagingDir/jdk"
-            commandLine 'bash', '-c', "find . -exec chmod --reference=\$(cygpath -u \'$rel\')/j2sdk-image/{} {} \\;"
-        }
-        exec {
-            workingDir "$packagingDir/jre"
-            commandLine 'bash', '-c', "find . -exec chmod --reference=\$(cygpath -u \'$rel\')/j2re-image/{} {} \\;"
-        }
-        exec {
-            workingDir "$packagingDir/jdk-symbols"
-            commandLine 'bash', '-c', "find . -exec chmod --reference=\$(cygpath -u \'$rel\')/j2sdk-image/{} {} \\;"
-        }
-    }
-}
-
 task copyVersionInfo() {
-    dependsOn fixPermissions
+    dependsOn copyCacerts
     outputs.dir(packagingDir)
     doLast {
         // Copy version.txt into JDK
