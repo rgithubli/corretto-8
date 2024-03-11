@@ -117,6 +117,8 @@ task copyImages() {
             include '**/*.diz'
             into "$packagingDir/jdk-symbols"
         }
+
+        applyJavafxOverlay
     }
 }
 
