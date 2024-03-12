@@ -99,6 +99,8 @@ task copyImages() {
     dependsOn executeBuild
     outputs.dir(packagingDir)
     doLast {
+        applyJavafxOverlay
+
         // Copy jdk
         copy {
             from "$imagesDir/j2sdk-image"
@@ -117,8 +119,6 @@ task copyImages() {
             include '**/*.diz'
             into "$packagingDir/jdk-symbols"
         }
-
-        applyJavafxOverlay
     }
 }
 
