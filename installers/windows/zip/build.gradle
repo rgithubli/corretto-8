@@ -90,9 +90,10 @@ task applyJavafxOverlay() {
 task copyImages() {
     dependsOn createJavafxOverlay
     dependsOn executeBuild
+    dependsOn applyJavafxOverlay
+
     outputs.dir(packagingDir)
     doLast {
-        applyJavafxOverlay
 
         // Copy jdk
         copy {
