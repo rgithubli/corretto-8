@@ -118,7 +118,17 @@ task copyImages() {
             into "$packagingDir/jdk-symbols"
         }
 
-        applyJavafxOverlay
+        copy {
+            from createJavafxOverlay.destinationDir
+            exclude "rt"
+            exclude "rt/**"
+            into "$packagingDir/jdk"
+        }
+        // Copy javafx into jre
+        copy {
+            from "$createJavafxOverlay.destinationDir/jre"
+            into "$packagingDir/jre"
+        }        
     }
 }
 
