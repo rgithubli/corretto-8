@@ -28,6 +28,8 @@ The following issues are addressed in 8.422.05.1:
 | Restore the default behavior of UnixNativeDispatcher.c | All | Aligns behavior of `java.nio.Files.readAttributes()` in Corretto with other OpenJDK distributions | Increases preicision of `java.nio.Files.readAttributes()` from seconds to milliseconds, see [#508](https://github.com/corretto/corretto-8/issues/508) |
 | JDK-8299677 | All | `Formatter.format` might take a long time to format an integer or floating-point | [JDK-8299677](bugs.openjdk.org/browse/JDK-8299677) | 
 | JDK-8329705 | JavaFX for Windows, macOS (x64) | Add missing Application thread checks to platform specific a11y methods | [JDK-8329705](https://bugs.openjdk.org/browse/JDK-8329705) |
+| JDK-8318854 | macOS | Resolves a warning when running AWT apps on macOS 14 | [JDK-8318854](https://bugs.openjdk.org/browse/JDK-8318854) |
+| JDK-8319669 | JavaFX for macOS | Resolves a warning when running AWT JavaFX apps on macOS 14 | [JDK-8319669](https://bugs.openjdk.org/browse/JDK-8319669)
 
 
 The following CVEs are addressed in 8.422.05.1:
