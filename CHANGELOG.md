@@ -3,7 +3,7 @@
 The following sections describe the changes for each release of Amazon Corretto 8.
 
 ## Corretto version: 8.422.05.1
-Release Date: July 15, 2024
+Release Date: July 16, 2024
 
 **Target Platforms <sup>1</sup>**
 
