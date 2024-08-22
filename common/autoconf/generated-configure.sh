@@ -725,10 +725,14 @@ FDLIBM_CFLAGS
 USE_FORMAT_OVERFLOW
 NO_LIFETIME_DSE_CFLAG
 NO_DELETE_NULL_POINTER_CHECKS_CFLAG
-LEGACY_EXTRA_ASFLAGS
-LEGACY_EXTRA_LDFLAGS
-LEGACY_EXTRA_CXXFLAGS
-LEGACY_EXTRA_CFLAGS
+LEGACY_TARGET_ASFLAGS
+LEGACY_TARGET_LDFLAGS
+LEGACY_TARGET_CXXFLAGS
+LEGACY_TARGET_CFLAGS
+LEGACY_HOST_ASFLAGS
+LEGACY_HOST_LDFLAGS
+LEGACY_HOST_CXXFLAGS
+LEGACY_HOST_CFLAGS
 CXXSTD_CXXFLAG
 CXX_O_FLAG_NONE
 CXX_O_FLAG_NORM
@@ -1054,7 +1058,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -1309,7 +1312,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1560,15 +1562,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1706,7 +1699,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1859,7 +1852,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -2791,7 +2783,15 @@ else $as_nop
 #define $2 innocuous_$2
 
 /* System header to define __stub macros and hopefully few prototypes,
-   which can conflict with char $2 (); below.  */
+    which can conflict with char $2 (void); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
 
 #include <limits.h>
 #undef $2
@@ -2802,7 +2802,7 @@ else $as_nop
 #ifdef __cplusplus
 extern "C"
 #endif
-char $2 ();
+char $2 (void);
 /* The GNU C library defines this for functions which it implements
     to always fail with ENOSYS.  Some functions are actually named
     something starting with __ and the normal name is an alias.  */
@@ -5047,7 +5047,7 @@ VS_TOOLSET_SUPPORTED_2022=true
 #CUSTOM_AUTOCONF_INCLUDE
 
 # Do not change or remove the following line, it is needed for consistency checks:
-DATE_WHEN_GENERATED=1705630975
+DATE_WHEN_GENERATED=1716396030
 
 ###############################################################################
 #
@@ -31106,21 +31106,34 @@ else $as_nop
 ac_save_CC=$CC
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-$ac_c_conftest_c11_program
-_ACEOF
-for ac_arg in '' -std=gnu11
-do
-  CC="$ac_save_CC $ac_arg"
-  if ac_fn_c_try_compile "$LINENO"
-then :
-  ac_cv_prog_cc_c11=$ac_arg
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam
-  test "x$ac_cv_prog_cc_c11" != "xno" && break
-done
-rm -f conftest.$ac_ext
-CC=$ac_save_CC
-fi
+#include <stdarg.h>
+#include <stdio.h>
+struct stat;
+/* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
+struct buf { int x; };
+FILE * (*rcsopen) (struct buf *, struct stat *, int);
+static char *e (char **p, int i)
+{
+  return p[i];
+}
+static char *f (char * (*g) (char **, int), char **p, ...)
+{
+  char *s;
+  va_list v;
+  va_start (v,p);
+  s = g (p, va_arg (v,int));
+  va_end (v);
+  return s;
+}
+
+/* OSF 4.0 Compaq cc is some sort of almost-ANSI by default.  It has
+   function prototypes and stuff, but not '\xHH' hex character constants.
+   These don't provoke an error unfortunately, instead are silently treated
+   as 'x'.  The following induces an error, until -std is added to get
+   proper ANSI mode.  Curiously '\x00'!='x' always comes out true, for an
+   array size at least.  It's necessary to write '\x00'==0 to get something
+   that's true only with -std.  */
+int osf4_cc_array ['\x00' == 0 ? 1 : -1];
 
 if test "x$ac_cv_prog_cc_c11" = xno
 then :
@@ -31168,37 +31181,19 @@ rm -f conftest.$ac_ext
 CC=$ac_save_CC
 fi
 
-if test "x$ac_cv_prog_cc_c99" = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
-printf "%s\n" "unsupported" >&6; }
-else $as_nop
-  if test "x$ac_cv_prog_cc_c99" = x
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
-printf "%s\n" "none needed" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c99" >&5
-printf "%s\n" "$ac_cv_prog_cc_c99" >&6; }
-     CC="$CC $ac_cv_prog_cc_c99"
-fi
-  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c99
-  ac_prog_cc_stdc=c99
-fi
-fi
-if test x$ac_prog_cc_stdc = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC option to enable C89 features" >&5
-printf %s "checking for $CC option to enable C89 features... " >&6; }
-if test ${ac_cv_prog_cc_c89+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_cv_prog_cc_c89=no
-ac_save_CC=$CC
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$ac_c_conftest_c89_program
+int test (int i, double x);
+struct s1 {int (*f) (int a);};
+struct s2 {int (*f) (double a);};
+int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
+int argc;
+char **argv;
+int
+main (void)
+{
+return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
+  ;
+  return 0;
+}
 _ACEOF
 for ac_arg in '' -qlanglvl=extc89 -qlanglvl=ansi -std -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
 do
@@ -44188,9 +44183,12 @@ printf "%s\n" "$tool_specified" >&6; }
       SYSROOT_LDFLAGS="-isysroot \"$SYSROOT\""
     fi
     # Propagate the sysroot args to hotspot
-    LEGACY_EXTRA_CFLAGS="$LEGACY_EXTRA_CFLAGS $SYSROOT_CFLAGS"
-    LEGACY_EXTRA_CXXFLAGS="$LEGACY_EXTRA_CXXFLAGS $SYSROOT_CFLAGS"
-    LEGACY_EXTRA_LDFLAGS="$LEGACY_EXTRA_LDFLAGS $SYSROOT_LDFLAGS"
+    LEGACY_HOST_CFLAGS="$LEGACY_EXTRA_CFLAGS"
+    LEGACY_HOST_CXXFLAGS="$LEGACY_EXTRA_CXXFLAGS"
+    LEGACY_HOST_LDFLAGS="$LEGACY_EXTRA_LDFLAGS"
+    LEGACY_TARGET_CFLAGS="$LEGACY_EXTRA_CFLAGS $SYSROOT_CFLAGS"
+    LEGACY_TARGET_CXXFLAGS="$LEGACY_EXTRA_CXXFLAGS $SYSROOT_CFLAGS"
+    LEGACY_TARGET_LDFLAGS="$LEGACY_EXTRA_LDFLAGS $SYSROOT_LDFLAGS"
   fi
 
 
@@ -44216,9 +44214,77 @@ do
   fi
 done
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ANSI C header files" >&5
+$as_echo_n "checking for ANSI C header files... " >&6; }
+if ${ac_cv_header_stdc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <float.h>
 
+int
+main (void)
+{
 
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_header_stdc=yes
+else
+  ac_cv_header_stdc=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
+if test $ac_cv_header_stdc = yes; then
+  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <string.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "memchr" >/dev/null 2>&1; then :
+
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+
+fi
+
+if test $ac_cv_header_stdc = yes; then
+  # ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "free" >/dev/null 2>&1; then :
+
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+#define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+int
+main (void)
+{
+  int i;
+  for (i = 0; i < 256; i++)
+    if (XOR (islower (i), ISLOWER (i))
+	|| toupper (i) != TOUPPER (i))
+      return 2;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_run "$LINENO"; then :
 
 
 
@@ -44955,11 +45021,14 @@ printf "%s\n" "$ac_cv_c_bigendian" >&6; }
     CFLAGS_JDK="${CFLAGS_JDK} -qchars=signed -q64 -qfullpath -qsaveopt"
     CXXFLAGS_JDK="${CXXFLAGS_JDK} -qchars=signed -q64 -qfullpath -qsaveopt"
   elif test "x$TOOLCHAIN_TYPE" = xgcc; then
-    LEGACY_EXTRA_CFLAGS="$LEGACY_EXTRA_CFLAGS -fstack-protector"
-    LEGACY_EXTRA_CXXFLAGS="$LEGACY_EXTRA_CXXFLAGS -fstack-protector"
+    LEGACY_HOST_CFLAGS="$LEGACY_HOST_CFLAGS -fstack-protector"
+    LEGACY_TARGET_CFLAGS="$LEGACY_TARGET_CFLAGS -fstack-protector"
+    LEGACY_HOST_CXXFLAGS="$LEGACY_HOST_CXXFLAGS -fstack-protector"
+    LEGACY_TARGET_CXXFLAGS="$LEGACY_TARGET_CXXFLAGS -fstack-protector"
     if test "x$OPENJDK_TARGET_OS" != xmacosx; then
       LDFLAGS_JDK="$LDFLAGS_JDK -Wl,-z,relro"
-      LEGACY_EXTRA_LDFLAGS="$LEGACY_EXTRA_LDFLAGS -Wl,-z,relro"
+      LEGACY_HOST_LDFLAGS="$LEGACY_HOST_LDFLAGS -Wl,-z,relro"
+      LEGACY_TARGET_LDFLAGS="$LEGACY_TARGET_LDFLAGS -Wl,-z,relro"
     fi
     CXXSTD_CXXFLAG="-std=gnu++98"
 
@@ -45066,10 +45135,18 @@ fi
   LDFLAGS_JDK="${LDFLAGS_JDK} $with_extra_ldflags"
 
   # Hotspot needs these set in their legacy form
-  LEGACY_EXTRA_CFLAGS="$LEGACY_EXTRA_CFLAGS $with_extra_cflags"
-  LEGACY_EXTRA_CXXFLAGS="$LEGACY_EXTRA_CXXFLAGS $with_extra_cxxflags"
-  LEGACY_EXTRA_LDFLAGS="$LEGACY_EXTRA_LDFLAGS $with_extra_ldflags"
-  LEGACY_EXTRA_ASFLAGS="$with_extra_asflags"
+  LEGACY_HOST_CFLAGS="$LEGACY_HOST_CFLAGS $with_extra_cflags"
+  LEGACY_TARGET_CFLAGS="$LEGACY_TARGET_CFLAGS $with_extra_cflags"
+  LEGACY_HOST_CXXFLAGS="$LEGACY_HOST_CXXFLAGS $with_extra_cxxflags"
+  LEGACY_TARGET_CXXFLAGS="$LEGACY_TARGET_CXXFLAGS $with_extra_cxxflags"
+  LEGACY_HOST_LDFLAGS="$LEGACY_HOST_LDFLAGS $with_extra_ldflags"
+  LEGACY_TARGET_LDFLAGS="$LEGACY_TARGET_LDFLAGS $with_extra_ldflags"
+  LEGACY_HOST_ASFLAGS="$with_extra_asflags"
+  LEGACY_TARGET_ASFLAGS="$with_extra_asflags"
+
+
+
+
 
 
 
@@ -46717,9 +46794,13 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int XOpenDisplay ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XOpenDisplay (void);
 int
 main (void)
 {
@@ -46743,9 +46824,13 @@ LIBS="-ldnet  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int dnet_ntoa ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dnet_ntoa (void);
 int
 main (void)
 {
@@ -46783,9 +46868,13 @@ LIBS="-ldnet_stub  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int dnet_ntoa ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dnet_ntoa (void);
 int
 main (void)
 {
@@ -46843,9 +46932,13 @@ LIBS="-lnsl  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int gethostbyname ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gethostbyname (void);
 int
 main (void)
 {
@@ -46883,9 +46976,13 @@ LIBS="-lbsd  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int gethostbyname ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gethostbyname (void);
 int
 main (void)
 {
@@ -46939,9 +47036,13 @@ LIBS="-lsocket $X_EXTRA_LIBS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int connect ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char connect (void);
 int
 main (void)
 {
@@ -46988,9 +47089,13 @@ LIBS="-lposix  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int remove ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char remove (void);
 int
 main (void)
 {
@@ -47037,9 +47142,13 @@ LIBS="-lipc  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int shmat ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char shmat (void);
 int
 main (void)
 {
@@ -47088,9 +47197,13 @@ LIBS="-lICE $X_EXTRA_LIBS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int IceConnectionNumber ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char IceConnectionNumber (void);
 int
 main (void)
 {
@@ -52196,9 +52309,13 @@ LIBS="-lgif  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int DGifGetCode ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char DGifGetCode (void);
 int
 main (void)
 {
@@ -52483,9 +52600,13 @@ LIBS="-lz  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int compress ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char compress (void);
 int
 main (void)
 {
@@ -52610,9 +52731,13 @@ LIBS="-lm  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int cos ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos (void);
 int
 main (void)
 {
@@ -52666,9 +52791,13 @@ LIBS="-ldl  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int dlopen ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen (void);
 int
 main (void)
 {
@@ -61611,3 +61740,4 @@ fi
       printf "\n"
     fi
   fi
+
